@@ -1,0 +1,875 @@
+<html lang="en">
+<style>rect {fill: lightblue; stroke: black;} html {
+  font-family: "Helvetica Neue", Helvetica, arial, sans-serif;
+}
+
+body {
+  padding: 1rem;
+}
+
+h1, h2, p {
+  margin: 0 0 1rem 0;
+}
+
+section p {
+  margin-bottom: 0;
+}
+
+p + p {
+  text-indent: 4rem;
+}
+
+.container {
+  max-width: 50rem;
+  margin: 0 auto;
+}
+
+ul[role='tablist'],
+ul[role='tablist'] li {
+  display: block;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul[role='tablist'] {
+  margin-bottom: -1px;
+}
+
+ul[role='tablist']:after {
+  content: " ";
+  display: block;
+  clear: both;
+  height: 0;
+}
+
+ul[role='tablist'] li {
+  display: block;
+  float: left;
+  position: relative;
+  z-index: 1;
+  margin-right: .25rem;
+}
+
+ul[role='tablist'] li a {
+  font-weight: bold;
+  text-decoration: none;
+
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  display: block;
+  background: #f9f9f9;
+  padding: .25rem .5rem;
+
+  border-color: #999;
+  border-style: solid;
+  border-width: 1px;
+}
+
+ul[role='tablist'] li a[aria-selected='true'] {
+  border-bottom-color: #f9f9f9;
+}
+
+section[role='tabpanel'] {
+  border-top-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border: 1px solid #999;
+  background: #f9f9f9;
+  padding: .5rem;
+  margin-bottom: 1rem;
+}
+
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 100px;
+    height: 50px;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+	opacity: 0;
+}
+
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 100px;
+    height: 50px;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+	opacity: 0;
+}
+div.treemap_div {
+	margin: auto;
+    position: absolute;
+    text-align: center;
+    width: 120px;
+    height: 90px;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+	opacity: 0;
+}
+
+.legend {
+	left:20px;
+	top:30px;
+}
+
+.axis text {
+	font: 10px sans-serif;
+}
+
+.axis line, .axis path {
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
+}</style>
+  <head>
+    <title>United States Arrest Data for 2018</title>
+    <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+   <!--<script src="d3.min.js"></script>-->
+  </head>
+  <body>
+    <div class="container">
+      <p>Welcome to my Narrative Visualization.</p>
+      <div id="container1">
+        <div id = "tooltip" class="tooltip"></div>
+        <ul role="tablist">
+          <li><a role="tab" href="#panel1" aria-selected="true">Background</a></li>
+          <li><a role="tab" href="#panel2" >Overview</a></li>
+          <li><a role="tab" href="#panel3" >Regions</a></li>
+          <li><a role="tab" href="#panel4" >Drug Arrests</a></li>
+          <li><a role="tab" href="#panel5" >Thoughts</a></li>
+        </ul>
+        <section role="tabpanel" id="panel1">
+          <h2>Background</h2>
+          <p>A widely quoted statistic by the <a href="https://www.aclu.org/issues/smart-justice/mass-incarceration#:~:text=Despite%20making%20up%20close%20to,outpacing%20population%20growth%20and%20crime.">American Civil Liberties Union</a> (ACLU), which does hold true, is that while the United States makes up nearly 5% of the world's population (more like 4.4% really), while we have nearly 25% of the worlds prison population.
+          <br>In 2018 alone, there were 10,310,960 arrests in the United States. <br>That's about half a million more arrests than if every person in Michigan was arrested. <br>Or approximately if everyone in Missouri and Kentucky combined were arrested once.<br><br>Let's look into the numbers a bit. Please continue to the next tab.<br><br>All data used in this narrative visualization is from the <a href="https://ucr.fbi.gov/crime-in-the-u.s/2018/crime-in-the-u.s.-2018/topic-pages/persons-arrested">FBI Arrest site</a>. There's plenty of more data on there and they do some great breakdowns. Props to them.</p>
+        </section>
+        <section role="tabpanel" id="panel2">
+          <h2>National Arrest Data: Overview</h2>
+          <p>Click the button below to generate a Treemap of Total US Arrest Data in 2018</p>
+          <button type="button" onclick="update_overview()">Begin Narrative</button>
+          <div id="treemap_div" class ="treemap_div"></div>
+          <div id="overviewGraph"></div>
+          <div id="overview_text"><p>Notes:<br> 1) The rape figure in this table is an aggregate total of the data submitted based on both the legacy and revised Uniform Crime Reporting definitions.<br>
+2) Violent crimes are offenses of murder and nonnegligent manslaughter, rape, robbery, and aggravated assault. Property crimes are offenses of burglary, larceny-theft, motor vehicle theft, and arson.<br><br>The most common arrests in 2018 were Drug Abuse Violations, Driving under the Influence, and Larceny-theft.<br>Continue to the next page to see a breakdown a crimes across regions and states of the United States.</p></div>
+        </section>
+        <section role="tabpanel" id="panel3">
+          <h2>National Arrest Data: Regions</h2>
+        	<div class="dropdown" id="dropdown"><select></select></div>
+          <div id='Title'></div>
+          <svg ></svg>
+          <div id="panel3changetext"><p></p></div>
+          <div id="panel3topstatictext"><p>Below you </p></div>
+          <div id="panel3statictext"><p>Notes:<br>
+1) The rape figure in this table is an aggregate total of the data submitted based on both the legacy and revised Uniform Crime Reporting definitions.<br>
+2) Violent crimes are offenses of murder and nonnegligent manslaughter, rape, robbery, and aggravated assault. Property crimes are offenses of burglary, larceny-theft, motor vehicle theft, and arson.<br>
+</p></div>
+        </section>
+        <section role="tabpanel" id="panel4">
+          <h2>National Arrest Data: Drug Arrests</h2>
+          <p>Click the buttons to generate a chart for percentage of drug arrests by region, or the entire United States!</p>
+          <button type="button" onclick="update_drug_abuse('UST')">United States Total</button>
+          <button type="button" onclick="update_drug_abuse('NE')">Northeast</button>
+          <button type="button" onclick="update_drug_abuse('MW')">Midwest</button>
+          <button type="button" onclick="update_drug_abuse('S')">South</button>
+          <button type="button" onclick="update_drug_abuse('W')">West</button>
+          <div id="drugArrestGraph"><svg width=500 height=300></svg></div>
+          <div><p id="drugabuseannotation"></p><p>Arrests for possession of marijuana in the United States are easily the leading arrest, with being nearly 37% of all drug arrests and nearly 50% of all possesion arrests. Explore the chart to compare other drug arrest distributions across reginos of the United States.<br>The highest arrest for Sale and manufacturing of illegal drugs nationally was heroin, cocaine, and their other derivatives.</p></div>
+        </section>
+        <section role="tabpanel" id="panel5">
+          <h2>Thoughts</h2>
+          <p>Thank you for enjoying my narrative visualizaiton. Feel free to revisit any of the previous slides and continue to explore the tools and charts.</p>
+        </section>
+      </div>
+    </div>
+  </body>
+<script>
+//This script for the tab functionality is directly from https://bl.ocks.org/shawnbot/eb40c7801a527e1949e6, which is based on Heydon Pickering's Practical ARIA Examples: http://heydonworks.com/practical_aria_examples/
+function maketabs(){
+  d3.selectAll("*[role='tablist']")
+    .each(function() {
+      // grab all of the tabs and panels
+      var tabs = d3.select(this).selectAll("*[role='tab'][href]")
+            .datum(function() {
+              var href = this.href,
+                  target = document.getElementById(href.split("#").pop());
+              return {
+                selected: this.getAttribute("aria-selected") === "true",
+                target: target
+              };
+            }),
+          targets = tabs.data()
+            .map(function(d) {
+              return d.target;
+            }),
+          panels = d3.selectAll("*[role='tabpanel']")
+            .filter(function() {
+              return targets.indexOf(this) > -1;
+            })
+            .datum(function(d) {
+              return d || {selected: false};
+            });
+
+      // when a tab is clicked, update the panels
+      tabs.on("click.tab", function(d) {
+        d3.event.preventDefault();
+        tabs.each(function(tab) { tab.selected = false; });
+        d.selected = true;
+        update();
+      });
+
+      // update them to start
+      update();
+
+      function update() {
+        var selected;
+        tabs
+          .attr("aria-selected", function(tab) {
+            if (tab.selected) selected = tab.target;
+            return tab.selected;
+          });
+        panels
+          .attr("aria-hidden", function(panel) {
+            panel.selected = (selected === this);
+            return !panel.selected;
+          })
+          .style("display", function(d) {
+            return d.selected ? null : "none";
+          });
+      }
+    });};
+maketabs();
+</script>
+<script>
+function shortArrestName(arrest){
+    if (arrest == "Stolen property; buying, receiving, possessing")
+      return "Stolen Property";
+    if (arrest == "Weapons; carrying, possessing, etc.")
+      return "Weapons";
+    if (arrest == "Sex offenses (except forcible rape and prostitution)")
+      return "Sex Offenses";
+      if (arrest == "Driving under the influence")
+        return "DUI";
+    return arrest;
+  };
+function normalDrugArrestName(arrest){
+  if (arrest == "Total_Sale_Manufacturing")
+    return "Total Sale & Manufacturing";
+  if (arrest == "Heroin_or_cocaine_and_their_derivatives_Sale_Manufacturing")
+    return "S/M of Heroine, Cocaine, and derivatives";
+  if (arrest == "Marijuana_Sale_Manufacturing")
+    return "S/M of Marijuana";
+  if (arrest == "Synthetic_or_manufactured_drugs_Sale_Manufacturing")
+    return "S/M of Synthetic Drugs";
+  if (arrest == "Other_dangerous_nonnarcotic_drugs_Sale_Manufacturing")
+    return "S/M other Dangerous Narcotics";
+  if (arrest == "Total_Possession")
+    return "Total Possession";
+    if (arrest == "Heroin_or_cocaine_and_their_derivatives_Possession")
+      return "Poss. of Heroine, Cocaine, and derivatives";
+    if (arrest == "Marijuana_Possession")
+      return "Poss. of Marijuana";
+    if (arrest == "Synthetic_or_manufactured_drugs_Possession")
+      return "Poss. of Synthetic Drugs";
+    if (arrest == "Other_dangerous_nonnarcotic_drugs_Possession")
+      return "Poss. of other Dangerous Narcotics";
+};
+function wrap(text) {
+  text.each(function() {
+    var text = d3.select(this),
+        words = text.text().split(/\s+/).reverse(),
+        word,
+        line = [],
+        lineNumber = 0,
+        lineHeight = 15, // ems
+        y = text.attr("y"),
+        dy = parseFloat(text.attr("dy")),
+        width = text.attr("id"),
+        tspan = text.text(null).append("tspan").attr("x", text.attr("x")).attr("y", y);
+    while (word = words.pop()) {
+      line.push(word);
+      tspan.text(line.join(" "));
+      if (tspan.node().getComputedTextLength() > width) {
+        line.pop();
+        tspan.text(line.join(" "));
+        line = [word];
+        tspan = text.append("tspan").attr("x", text.attr("x")).attr("y", text.attr("y")).attr("dy", ++lineNumber * lineHeight).text(word);
+      }
+    }
+  });
+};
+function update_drug_abuse(text){
+  function which_id(data){
+      if (text == 'UST'){ return data.UnitedStatesTotal;}
+      if (text == 'NE'){ return data.Northeast;}
+      if (text == 'MW'){ return data.Midwest;}
+      if (text == 'S'){ return data.South;}
+      if (text == 'W'){ return data.West;}
+    };
+  var data =  d3.csv("https://raw.githubusercontent.com/edmoral18/Data-Visualization-Narrative/master/DrugAbuseArrestCsvs/Drug_Abuse_2018.csv", function(d){
+   return {
+     Arrest : d.Arrest,
+     UnitedStatesTotal : +d.UnitedStatesTotal,
+     Midwest : +d.Midwest,
+     Northeast : +d.Northeast,
+     South : +d.South,
+     West : +d.West
+   };
+ }).then(function(data) {
+   var margin = 50;
+   var bar_width = 40;
+   var divTip = d3.select("#tooltip").style("opacity", 0);
+   var mouseover = function(d,i) {
+     function getPercent(region, arrest){
+       console.log("GP: " + region + " " + arrest);
+       for (var i = 0 ; i < d.length; i++){
+         if (d.Arrest == arrest){
+           switch (text){
+             case "MW":
+             return d.region;
+             case "NE":
+             return;
+             case "UST":
+             console.log("poopmw");
+             return;
+             case "W":
+             console.log("poopmw");
+             return;
+             case "S":
+             console.log("poopmw");
+             return;
+           }
+         }
+       }
+     }
+     console.log("Elliott " + i);
+     getPercent(text, d.Arrest);
+     //d3.selectAll("#drugabuseannotation").html(text +" Percentage of total Arrests: " + d.UnitedStatesTotal);
+       d3.selectAll("#barchart").select("#drugrect" + i).transition().style("fill", "purple");
+       divTip.transition().duration(200).style("opacity", .9);
+       divTip.html("Arrest: " + normalDrugArrestName(d.Arrest) ).style("left", (d3.event.pageX) + "px").style("top", (d3.event.pageY - 28) + "px");
+   }
+   var mouseleave = function(d,i) {
+     d3.selectAll("#drugabuseannotation").html("");
+     d3.selectAll("#barchart").select("#drugrect" + i).transition().style("fill", "lightblue");
+     divTip.transition().duration(500).style("opacity", 0);
+   }
+   var x = d3.scaleLinear().domain([0,10]).range([0,400]);
+   var y = d3.scaleLinear().domain([0,100]).range([200,0]);
+   var svg = d3.select("#drugArrestGraph");
+   svg.select("g").selectAll('rect').data(data)
+   .style("fill", "lightblue").attr("id", function(d,i){return "drugrect"+i})
+   .attr("x", function(d,i) {return x(i);})
+   .attr("width",bar_width)
+   .on("mouseover", mouseover).on("mouseleave", mouseleave).transition().duration(800).attr("height",function(d) {return 200-y(which_id(d));}).attr("y", function(d){return y(which_id(d))});
+
+   svg.select("svg").append("g").attr("transform", "translate("+margin+","+margin+")").call(d3.axisLeft(y));
+   svg.select("svg").append("g").attr("transform", "translate("+margin+","+(200+margin)+")").call(d3.axisBottom(x));
+ });
+};
+function setup_drug_abuse(){
+  var data = [1,2,3,4,5,6,7,8,9,10];
+  var margin = 50;
+  d3.select("#drugArrestGraph").select("svg").append("g").attr("transform","translate("+margin+","+margin+")")
+  .attr("id", "barchart").selectAll('rect').data(data).enter().append('rect');
+}
+function update_overview(){
+  d3.select("#panel2").select("button").attr("onclick","");
+// set the dimensions and margins of the graph
+var margin = {top: 10, right: 10, bottom: 10, left: 10},
+  width = 600 - margin.left - margin.right,
+  height = 600 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#overviewGraph")
+.append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+.append("g")
+  .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")")
+        .attr("id", "tree_g");
+
+// Read data
+dat =  d3.csv('https://raw.githubusercontent.com/edmoral18/Data-Visualization-Narrative/master/2018_FBI_Arrest_total/2018_FBI_Arrest_dataTotal.csv', function(data) {
+  return {
+    Arrest : data.Arrest,
+    Parent : data.Parent,
+    Count : +data.Count,
+  };
+}).then(function(data){
+  // stratify the data: reformatting for d3.js
+var root = d3.stratify()
+  .id(function(d) {return d.Arrest; })   // Name of the entity (column name is name in csv)
+  .parentId(function(d) {return d.Parent; })   // Name of the parent (column name is parent in csv)
+  (data);
+root.sum(function(d) { return +d.Count })   // Compute the numeric value for each entity
+
+// Then d3.treemap computes the position of each element of the hierarchy
+// The coordinates are added to the root object above
+d3.treemap()
+  .size([width, height])
+  .padding(4)
+  (root);
+
+  var colorscale = d3.scaleLinear()
+.domain([564, 3231700])
+.range(['#8dc8e3', '#8a1cff']);
+
+var mouseover = function(d,i){
+  d3.selectAll("#treemap_div").html("<p>CHARGE: " + d.data.Arrest + "<br>" + "ARRESTS: " + d.value.toLocaleString() + "</p>").transition().duration(300).style("opacity", 1)
+    .style("left", (d3.event.pageX + 40) + "px").style("top", (d3.event.pageY - 28) + "px").style("color", "black");
+  d3.selectAll("#tree_g").select("#treetile" + i).transition().style("fill", "orange");
+}
+var mouseleave = function(d,i){
+  d3.selectAll("#treemap_div").transition().duration(200).style("opacity", 0);
+  d3.selectAll("#tree_g").select("#treetile" + i).transition().style("fill", function(d){if (d.value < 10310960){return colorscale(d.value);} return "#6015b0"});
+}
+
+svg
+  .selectAll("rect")
+  .data(root.leaves())
+  .enter()
+  .append("rect")
+    .attr('x', function (d) { return d.x0; })
+    .attr('y', function (d) { return d.y0; })
+    .attr('width', function (d) { return  d.x1 - d.x0; })
+    .attr('height', function (d) { return  d.y1 - d.y0; })
+    .style("stroke", "black")
+    .style("fill", function(d){if (d.value < 10310960){return colorscale(d.value);} return "#6015b0"})
+    .attr("id", function(d,i){return "treetile" + i;}).on("mouseover", mouseover).on("mouseleave", mouseleave);
+
+// and to add the text labels
+svg
+  .selectAll("text")
+  .data(root.leaves())
+  .enter()
+  .append("text")
+    .attr("x", function(d){ return d.x0+5})    // +10 to adjust position (more right)
+    .attr("y", function(d){ return d.y0+15})    // +20 to adjust position (lower)
+    .text(function(d){
+      if (d.value > 100000){return shortArrestName(d.data.Arrest)}
+    return "";})
+    .attr("id", function(d){return d.x1 - d.x0;})
+    .attr("font-size", "15px")
+    .attr("fill", "white");
+    svg
+      .selectAll("text").call(wrap);});
+};
+function stateToRegion(state){
+	var s = "South";
+	var mw = "Midwest";
+	var ne = "Northeast";
+	var w = "West";
+	switch (state){
+		case "Connecticut":
+		return ne;
+		case "Connecticut":
+		return ne;
+		case "Maine" :
+		return ne;
+		case "Massachusetts" :
+		return ne;
+		case "New Hampshire" :
+		return ne;
+		case "Rhode Island" :
+		return ne;
+		case "Vermont":
+		return ne;
+		case "New Jersey":
+		return ne;
+		case "New York":
+		return ne;
+		case "Pennsylvania":
+		return ne;
+		case "Illinois":
+		return mw;
+		case "Indiana":
+		return mw;
+		case "Michigan":
+		return mw;
+		case "Ohio":
+		return mw;
+		case "Wisconsin":
+		return mw;
+		case "Iowa":
+		return mw;
+		case "Kansas":
+		return mw;
+		case "Minnesota":
+		return mw;
+		case "Missouri":
+		return mw;
+		case "Nebraska":
+		return mw;
+		case "North Dakota":
+		return mw;
+		case "South Dakota":
+		return mw;
+		case "Delaware":
+		return s;
+		case "District of Columbia":
+		return s;
+		case "Florida":
+		return s;
+		case "Georgia":
+		return s;
+		case "Maryland":
+		return s;
+		case "North Carolina":
+		return s;
+		case "South Carolina":
+		return s;
+		case "Virginia":
+		return s;
+		case "West Virginia":
+		return s;
+		case "Alabama":
+		return s;
+		case "Kentucky":
+		return s;
+		case "Mississippi":
+		return s;
+		case "Tennessee":
+		return s;
+		case "Arkansas":
+		return s;
+		case "Louisiana":
+		return s;
+		case "Oklahoma":
+		return s;
+		case "Texas":
+		return s;
+		case "Arizona":
+		return w;
+		case "Colorado":
+		return w;
+		case "Idaho":
+		return w;
+		case "Montana":
+		return w;
+		case "Nevada":
+		return w;
+		case "New Mexico":
+		return w;
+		case "Utah":
+		return w;
+		case "Wyoming":
+		return w;
+		case "Alaska":
+		return w;
+		case "California":
+		return w;
+		case "Hawaii":
+		return w;
+		case "Oregon":
+		return w;
+		case "Washington":
+		return w;
+	}
+};
+function updatemap(){
+	var sect = document.getElementById("ddsel2");
+	var arrest = sect.options[sect.selectedIndex].index;
+	arrest_index = arrest;
+	//Width and height of map
+	var width = 960;
+	var height = 500;
+
+	var lowColor = '#aec0e8';
+	var highColor = '#965ebf'
+
+	// D3 Projection
+	var projection = d3.geoAlbersUsa()
+	  .translate([width / 2, height / 2]) // translate to center of screen
+	  .scale([1000]); // scale things down so see entire US
+
+	// Define path generator
+	var path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
+	  .projection(projection); // tell path generator to use albersUsa projection
+
+	//Create SVG element and append map to the SVG
+
+	// Load in my states data!
+	d3.csv("https://raw.githubusercontent.com/edmoral18/Data-Visualization-Narrative/master/2018_FBI_Arrest_By_Region/2018_FBI_Arrest_By_Region.csv").then(function(data){
+	function region_rate(region, i){
+		switch (region){
+			case "Midwest":
+			return Number((data[i].MidwestRate).replace(",",""));
+			case "Northeast":
+			return Number((data[i].NortheastRate).replace(",",""));
+			case "West":
+			return Number((data[i].WestRate).replace(",",""));
+			case "South":
+			return  Number((data[i].SouthRate).replace(",",""));
+			return Number((data[i].UnitedStatesRate).replace(",",""));
+		}
+	}
+	function fixTotalName(arrest){
+		if (arrest == "TOTAL"){
+			return "All Arrests 2018";
+		}
+		return arrest;
+	}
+	// Load in my states data!
+		var dataArray = [];
+    let regionmap = new Map();
+    var ne = parseFloat(data[arrest_index].NortheastRate.replace(",",""));
+			dataArray.push(ne);
+      regionmap.set(ne, "Northeast");
+      var s = parseFloat(data[arrest_index].SouthRate.replace(",",""));
+			dataArray.push(s);
+      regionmap.set(s, "South");
+      var mw = parseFloat(data[arrest_index].MidwestRate.replace(",",""));
+			dataArray.push(mw);
+      regionmap.set(mw, "Midwest");
+      var w = parseFloat(data[arrest_index].WestRate.replace(",",""));
+			dataArray.push(w);
+      regionmap.set(w, "West");
+
+		var minVal = d3.min(dataArray)
+		var maxVal = d3.max(dataArray)
+    d3.select("#panel3changetext").html("The highest rate of this arrest was " + maxVal + " arrests per 100,000 inhabitants in the " + regionmap.get(maxVal)+" region<br>The lowest rate of this arrest was " + minVal + " arrests per 100,000 inhabitants in the " + regionmap.get(minVal) + " region.");
+		d3.selectAll("#Title").html("<p>Arrest: "+ fixTotalName(data[arrest_index].Arrest)+"<br>Average region rate of arrests per 100,000 inhabitants</p>");
+		var ramp = d3.scaleLinear().domain([minVal,maxVal]).range([lowColor,highColor])
+
+	  // Load GeoJSON data and merge with states data
+	  d3.json("https://gist.githubusercontent.com/michellechandra/0b2ce4923dc9b5809922/raw/a476b9098ba0244718b496697c5b350460d32f99/us-states.json").then(function(json) {
+	    // Loop through each state data value in the json file
+			//was var i = 0; i < data.length; i++
+	    for (var j = 0; j < json.features.length; j++) {
+
+	      // Grab State Name
+	      //was var dataState = data[i].state;
+				var jsonState = json.features[j].properties.name;
+				if (jsonState == "Puerto Rico"){continue;}
+				var region = stateToRegion(jsonState);
+				json.features[j].properties.value = region_rate(region, arrest_index);
+	    }
+			var svg = d3.selectAll("svg");
+	    // Bind the data to the SVG and create one path per GeoJSON feature
+	    svg.selectAll("path")
+	      .data(json.features)
+	      .transition().duration(700)
+	      .style("stroke", "#fff")
+	      .style("stroke-width", "1")
+	      .style("fill", function(d) {return ramp(d.properties.value) });
+
+			// add a legend
+			var w = 140, h = 300;
+
+			 var key = d3.select("#legend");
+			 key.remove();
+			 function makeLegend(){
+			 	var w = 140, h = 350;
+
+			  var key = d3.select("#panel3")
+			 	 .append("svg")
+			 	 .attr("width", w+100)
+			 	 .attr("height", h+100)
+			 	 .attr("class", "legend").attr("id","legend").attr("transform", "translate(0,-560)");
+;
+
+			  var legend = key.append("defs")
+			 	 .append("svg:linearGradient")
+			 	 .attr("id", "gradient")
+			 	 .attr("x1", "100%")
+			 	 .attr("y1", "0%")
+			 	 .attr("x2", "100%")
+			 	 .attr("y2", "100%")
+			 	 .attr("spreadMethod", "pad");
+
+			  legend.append("stop")
+			 	 .attr("offset", "0%")
+			 	 .attr("stop-color", highColor)
+			 	 .attr("stop-opacity", 1);
+
+			  legend.append("stop")
+			 	 .attr("offset", "100%")
+			 	 .attr("stop-color", lowColor)
+			 	 .attr("stop-opacity", 1);
+
+			  key.append("rect")
+			 	 .attr("width", w - 100)
+			 	 .attr("height", h)
+			 	 .style("fill", "url(#gradient)")
+			 	 .attr("transform", "translate(0,50)")
+			  var y = d3.scaleLinear()
+			 	 .range([h, 0])
+			 	 .domain([minVal, maxVal]);
+
+			  var yAxis = d3.axisRight(y);
+
+			  key.append("g")
+			 	 .attr("class", "y axis")
+			 	 .attr("transform", "translate(51,50)")
+			 	 .call(yAxis);
+			 }
+			 makeLegend(minVal, maxVal);
+
+	  });
+});};
+function makemap(arrest_index){
+//Width and height of map
+var width = 960;
+var height = 500;
+
+var lowColor = '#aec0e8';
+var highColor = '#965ebf'
+
+// D3 Projection
+var projection = d3.geoAlbersUsa()
+  .translate([width / 2, height / 2]) // translate to center of screen
+  .scale([1000]); // scale things down so see entire US
+
+// Define path generator
+var path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
+  .projection(projection); // tell path generator to use albersUsa projection
+
+//Create SVG element and append map to the SVG
+var svg = d3.select("#panel3")
+  .select("svg")
+  .attr("width", width)
+  .attr("height", height)
+	.attr("id", "mapsvg")
+  .attr("transform","translate(-40,0)");
+
+// Load in my states data!
+d3.csv("https://raw.githubusercontent.com/edmoral18/Data-Visualization-Narrative/master/2018_FBI_Arrest_By_Region/2018_FBI_Arrest_By_Region.csv").then(function(data){
+function region_rate(region, i){
+	switch (region){
+		case "Midwest":
+		return Number((data[i].MidwestRate).replace(",",""));
+		case "Northeast":
+		return Number((data[i].NortheastRate).replace(",",""));
+		case "West":
+		return Number((data[i].WestRate).replace(",",""));
+		case "South":
+		return  Number((data[i].SouthRate).replace(",",""));
+		return Number((data[i].UnitedStatesRate).replace(",",""));
+	}
+}
+function fixTotalName(arrest){
+	if (arrest == "TOTAL"){
+		return "All Arrests 2018";
+	return arrest;
+	}
+}
+// Load in my states data!
+	var dataArray = [];
+		dataArray.push(parseFloat(data[arrest_index].NortheastRate.replace(",","")));
+		dataArray.push(parseFloat(data[arrest_index].SouthRate.replace(",","")));
+		dataArray.push(parseFloat(data[arrest_index].MidwestRate.replace(",","")));
+		dataArray.push(parseFloat(data[arrest_index].WestRate.replace(",","")));
+
+	var minVal = d3.min(dataArray)
+	var maxVal = d3.max(dataArray)
+	d3.selectAll("#Title").html("<p>Arrest: "+fixTotalName(data[arrest_index].Arrest)+"<br>Average region rate of arrests per 100,000 inhabitants</p>");
+	var ramp = d3.scaleLinear().domain([minVal,maxVal]).range([lowColor,highColor])
+
+  // Load GeoJSON data and merge with states data
+  d3.json("https://gist.githubusercontent.com/michellechandra/0b2ce4923dc9b5809922/raw/a476b9098ba0244718b496697c5b350460d32f99/us-states.json").then(function(json) {
+    // Loop through each state data value in the json file
+		//was var i = 0; i < data.length; i++
+    for (var j = 0; j < json.features.length; j++) {
+
+      // Grab State Name
+      //was var dataState = data[i].state;
+			var jsonState = json.features[j].properties.name;
+			if (jsonState == "Puerto Rico"){continue;}
+			var region = stateToRegion(jsonState);
+			json.features[j].properties.value = region_rate(region, arrest_index);
+    }
+		var svg = d3.selectAll("#panel3").selectAll("svg");
+    // Bind the data to the SVG and create one path per GeoJSON feature
+    var StateIdMap = {};
+    svg.selectAll("path")
+      .data(json.features)
+      .enter()
+      .append("path")
+      .attr("d", path)
+			.attr("id", function(d, i){  StateIdMap[d.properties.name] = i;return "statepath" + i;})
+      .style("stroke", "#fff")
+      .style("stroke-width", "1")
+      .style("fill", function(d) {return ramp(d.properties.value) });
+
+		// add a legend
+		function makeLegend(){
+		 var w = 140, h = 350;
+
+		 var key = d3.select("#panel3")
+			.append("svg")
+			.attr("width", w)
+			.attr("height", h+70)
+			.attr("class", "legend").attr("id","legend").attr("transform", "translate(0,-560)");
+
+		 var legend = key.append("defs")
+			.append("svg:linearGradient")
+			.attr("id", "gradient")
+			.attr("x1", "100%")
+			.attr("y1", "0%")
+			.attr("x2", "100%")
+			.attr("y2", "100%")
+			.attr("spreadMethod", "pad");
+
+		 legend.append("stop")
+			.attr("offset", "0%")
+			.attr("stop-color", highColor)
+			.attr("stop-opacity", 1);
+
+		 legend.append("stop")
+			.attr("offset", "100%")
+			.attr("stop-color", lowColor)
+			.attr("stop-opacity", 1);
+
+		 key.append("rect")
+			.attr("width", w - 100)
+			.attr("height", h)
+			.style("fill", "url(#gradient)")
+			.attr("transform", "translate(0,50)");
+
+		 var y = d3.scaleLinear()
+			.range([h, 0])
+			.domain([minVal, maxVal]);
+
+		 var yAxis = d3.axisRight(y);
+
+		 key.append("g")
+			.attr("class", "y axis")
+			.attr("transform", "translate(51,50)")
+			.call(yAxis)
+		}
+		makeLegend();
+  });});};
+
+	function makedropdown(){
+		d3.csv("https://raw.githubusercontent.com/edmoral18/Data-Visualization-Narrative/master/2018_FBI_Arrest_By_Region/2018_FBI_Arrest_By_Region.csv").then(function(data){
+			var dropdown = d3.select("#dropdown").attr("id","ddsel");
+			var options = dropdown.select("select").attr("id", "ddsel2").selectAll("option").data(data).enter().append("option").text(function(d){return d.Arrest;});
+			dropdown.select("select").select("option").attr("selected","selected");
+			dropdown.on("change", updatemap);
+		});
+	};
+function set_up_overview(){};
+console.log("We've Begun");
+setup_drug_abuse();
+set_up_overview();
+makemap(0);
+makedropdown();
+console.log("We've Ended");
+</script>
+</html>
